@@ -31,12 +31,18 @@ export default function Home() {
             <h1 className="text-7xl">Federico Caramelli</h1>
             <h2 className="text-4xl">Full-Stack Developer</h2>
           </div>
-          <SocialIcons />
         </div>
       </section>
       <About />
       <MySkills />
       <Experience />
+      <section style={{ backgroundColor: "var(--bg-1)" }}>
+        <div className="flex flex-col items-center justify-center py-40 gap-10 max-w-3xl mx-auto">
+          <h1 className="text-6xl">Thank you for your time!</h1>
+          <p>If you have any questions or would like to get in touch, please feel free to contact me.</p>
+          <SocialIcons />
+        </div>
+      </section>
     </>
   );
 }
