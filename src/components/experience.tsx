@@ -283,11 +283,11 @@ export const Experience = () => {
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center px-4">Experience</h1>
 
                 {/* Desktop Timeline - mantiene el diseño original */}
-                <div className="hidden sm:block w-full flex flex-col items-center justify-center">
+                <div className="hidden md:block w-full flex flex-col items-center justify-center">
                     {experiences.map((exp, index) => (
                         <div key={exp.id} className="w-full" style={{ backgroundColor: index % 2 === 0 ? "var(--bg-2)" : "var(--bg-3)" }}>
                             <div className="max-w-4xl mx-auto">
-                                <div className="flex gap-8 mb-12 pb-12 relative" style={{marginTop: '-41px'}}>
+                                <div className="flex gap-8  pb-12 relative" style={{top: '-41px'}}>
                                      {/* Línea vertical de la timeline */}
                                      {index < experiences.length - 1 && (
                                          <div className="absolute left-10 top-16 w-0.5 bg-gray-300" style={{ height: index === experiences.length - 2 ? '100%' : 'calc(100% + 3rem)' }}></div>
@@ -357,7 +357,7 @@ export const Experience = () => {
                 </div>
 
                 {/* Mobile Layout - diseño simple y limpio */}
-                <div className="sm:hidden w-full max-w-4xl mx-auto px-4 space-y-6">
+                <div className="md:hidden w-full max-w-4xl mx-auto px-4 space-y-6">
                     {experiences.map((exp, index) => (
                         <div key={exp.id} className="rounded-lg p-4 " style={{ backgroundColor: "var(--bg-3)" }}>
                             {/* Header con logo y fechas */}
