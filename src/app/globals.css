@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
+/* ===== Variables base (light por defecto) ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paleta */
+  --bg-1: #0a0a0a;
+  --bg-2: #3a3a3a;
+  --text: #ededed;
+  --highlight: #eb2c1f; /* pedido */
+
+  /* Compat: mantener background/foreground actuales */
+  --background: var(--bg-1);
+  --foreground: var(--text);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colores “oficiales” para utilities de Tailwind */
+  --color-background: var(--bg-1);
+  --color-foreground: var(--text);
+
+  /* Tokens adicionales */
+  --color-bg-1: var(--bg-1);
+  --color-bg-2: var(--bg-2);
+  --color-text: var(--text);
+  --color-highlight: var(--highlight);
+
+  /* Tipografía (si ya definiste var(--font-nunito) en otro lado) */
+  --font-sans: var(--font-nunito);
 }
 
 @media (prefers-color-scheme: dark) {
