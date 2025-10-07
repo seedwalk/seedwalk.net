@@ -279,13 +279,13 @@ const experiences: ExperienceItem[] = [
 export const Experience = () => {
     return (
         <section style={{ backgroundColor: "var(--bg-2)" }}>
-            <div className="flex flex-col items-center justify-center py-20 gap-10">
-                <h1 className="text-7xl">Experience</h1>
+            <div className="flex flex-col items-center justify-center py-16 sm:py-20 gap-6 sm:gap-10">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center px-4">Experience</h1>
 
-                {/* Timeline */}
-                <div className="w-full flex flex-col items-center justify-center">
+                {/* Desktop Timeline - mantiene el diseño original */}
+                <div className="hidden sm:block w-full flex flex-col items-center justify-center">
                     {experiences.map((exp, index) => (
-                        <div key={exp.id} className="w-full" style={{ backgroundColor: index % 2 === 0 ? "var(--bg-2)" : "var(--bg-3" }}>
+                        <div key={exp.id} className="w-full" style={{ backgroundColor: index % 2 === 0 ? "var(--bg-2)" : "var(--bg-3)" }}>
                             <div className="max-w-4xl mx-auto">
                                 <div className="flex gap-8 mb-12 pb-12 relative" style={{marginTop: '-41px'}}>
                                      {/* Línea vertical de la timeline */}
@@ -352,6 +352,59 @@ export const Experience = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Mobile Layout - diseño simple y limpio */}
+                <div className="sm:hidden w-full max-w-4xl mx-auto px-4 space-y-6">
+                    {experiences.map((exp, index) => (
+                        <div key={exp.id} className="rounded-lg p-4 " style={{ backgroundColor: "var(--bg-3)" }}>
+                            {/* Header con logo y fechas */}
+                            <div className="flex items-center gap-3 mb-3">
+                                {exp.logo && (
+                                    <img
+                                        src={exp.logo}
+                                        alt={`${exp.company} logo`}
+                                        className="w-12 h-12 rounded object-contain"
+                                        onError={(e) => {
+                                            console.log('Error loading image:', exp.logo);
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
+                                )}
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-white">{exp.company}</h3>
+                                    <p className="text-sm text-gray-300">{exp.position}</p>
+                                </div>
+                                <div className="text-right">
+                                    <Badge className="text-xs">
+                                        <div className="flex flex-col gap-1">
+                                            <span>{exp.startDate}</span>
+                                            <span>{exp.endDate}</span>
+                                        </div>
+                                    </Badge>
+                                </div>
+                            </div>
+
+                            {/* Descripción */}
+                            <p className="text-sm text-gray-300 mb-3 leading-relaxed">
+                                {exp.description}
+                            </p>
+
+                            {/* Responsabilidades - colapsables */}
+                            <details className="group">
+                                <summary className="text-sm font-semibold text-white cursor-pointer hover:text-gray-300 transition-colors">
+                                    Responsibilities ({exp.responsibilities.length})
+                                </summary>
+                                <ul className="mt-2 space-y-2 pl-4">
+                                    {exp.responsibilities.map((responsibility, idx) => (
+                                        <li key={idx} className="text-xs text-gray-400 leading-relaxed relative before:content-['•'] before:absolute before:-left-3 before:text-gray-500">
+                                            {responsibility}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </details>
                         </div>
                     ))}
                 </div>

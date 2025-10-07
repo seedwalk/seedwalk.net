@@ -29,25 +29,21 @@ const skills = [
 const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgroundColor: string } }) => (
     <div style={
       {
-        width: 130,
-        height: 130,
         backgroundColor: "var(--bg-2)",
-        borderRadius: "10px",
-        padding: "16px"
+        borderRadius: "10px"
       }} 
-      className="flex flex-col items-center gap-2 hover:scale-105 transition-transform justify-around">
+      className="flex flex-col items-center gap-2 hover:scale-105 transition-transform justify-around w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] p-3 sm:p-3 md:p-4">
       <div style={{
         backgroundColor: skill.backgroundColor, 
         borderRadius: '10px', 
-        padding: '8px',
         display: skill.backgroundColor === 'transparent' ? 'none' : 'block'
-      }}>
+      }} className="p-1 sm:p-1.5 md:p-2">
         <Image
           src={`/assets/skills/${skill.filename}`}
           alt={skill.name}
           width={48}
           height={48}
-          className="object-contain"
+          className="object-contain w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10"
         />
       </div>
       {skill.backgroundColor === 'transparent' && (
@@ -56,10 +52,10 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
           alt={skill.name}
           width={48}
           height={48}
-          className="object-contain"
+          className="object-contain w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10"
         />
       )}
-      <span className="text-sm text-center" style={{ color: "var(--text)" }}>
+      <span className="text-xs sm:text-xs md:text-sm text-center" style={{ color: "var(--text)" }}>
         {skill.name}
       </span>
     </div>
@@ -69,9 +65,16 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
   export const MySkills = () => {
     return (
       <section style={{ backgroundColor: "var(--bg-1)" }}>
-        <div className="flex flex-col items-center justify-center py-40 gap-10 max-w-3xl mx-auto">
-          <h1 className="text-7xl">Skills</h1>
-          <div className="flex flex-wrap gap-4 w-full px-4 justify-center">
+        <div className="flex flex-col items-center justify-center py-16 sm:py-24 md:py-32 lg:py-40 gap-6 sm:gap-8 md:gap-10 max-w-6xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center">Skills</h1>
+          {/* Desktop layout - mantiene el diseño original */}
+          <div className="hidden sm:flex flex-wrap gap-4 w-full justify-center">
+            {skills.map((skill, index) => (
+              <SkillBox key={`${skill.name}-${index}`} skill={skill} />
+            ))}
+          </div>
+          {/* Mobile layout - flex más compacto */}
+          <div className="sm:hidden flex flex-wrap gap-3 w-full justify-center">
             {skills.map((skill, index) => (
               <SkillBox key={`${skill.name}-${index}`} skill={skill} />
             ))}
