@@ -23,8 +23,8 @@ const experiences: ExperienceItem[] = [
         id: "1",
         company: "Mevuelo",
         position: "Senior Full Stack Developer",
-        startDate: "2024-01",
-        endDate: "Present",
+        startDate: "Aug 2023",
+        endDate: "Oct 2025",
         description: "Desarrollo de aplicaciones web escalables y sistemas de gestión para la industria de viajes. Liderazgo técnico en proyectos críticos.",
         responsibilities: [
             "Desarrollo full-stack con tecnologías modernas",
@@ -41,7 +41,7 @@ const experiences: ExperienceItem[] = [
         company: "Nowsta",
         position: "Senior Full Stack Developer",
         startDate: "Feb 2022",
-        endDate: "2023-12",
+        endDate: "Jul 2023",
         description: "As a Senior Full Stack Developer at Nowsta, I led a team of 4 developers in the creation of DeepRate, an internal solution that encompassed various critical functions such as rates repository management, timecards to invoice processing, timecards to billing processing, and configuration of key applications. Additionally, I was part of a team responsible for modernizing legacy React applications, updating them to current industry practices. Key responsibilities included:",
         responsibilities: [
             "Leading a team of 4 developers in the end-to-end development of the DeepRate solution, ensuring adherence to coding standards, best practices, and project timelines.",
