@@ -16,7 +16,12 @@ export const useScrollSnap = ({ sections, snapThreshold = 50 }: ScrollSnapConfig
     
     setIsScrolling(true);
     const windowHeight = window.innerHeight;
-    const targetScrollY = sectionIndex * windowHeight;
+    let targetScrollY = sectionIndex * windowHeight;
+    
+    // Para Experience (índice 3), agregar 20px extra para evitar espacio negro
+    if (sectionIndex === 3) {
+      targetScrollY += 20;
+    }
     
     window.scrollTo({
       top: targetScrollY,
@@ -68,7 +73,14 @@ export const useScrollSnap = ({ sections, snapThreshold = 50 }: ScrollSnapConfig
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
     const windowHeight = window.innerHeight;
-    const newSectionIndex = Math.round(currentScrollY / windowHeight);
+    
+    // Ajustar para Experience que tiene 20px extra
+    let adjustedScrollY = currentScrollY;
+    if (currentScrollY >= windowHeight * 3) {
+      adjustedScrollY = currentScrollY - 20;
+    }
+    
+    const newSectionIndex = Math.round(adjustedScrollY / windowHeight);
     
     if (newSectionIndex !== currentSection) {
       setCurrentSection(newSectionIndex);

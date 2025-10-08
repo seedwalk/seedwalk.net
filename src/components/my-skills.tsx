@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { useScrollSnap } from "@/hooks/useScrollSnap";
 
 const skills = [
     { name: "HTML5", filename: "html-5.png", backgroundColor: "white" },
@@ -67,6 +69,13 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
   export const MySkills = () => {
     const [isFixed, setIsFixed] = useState(false);
     const [shouldScroll, setShouldScroll] = useState(false);
+    const { scrollToSection } = useScrollSnap({
+      sections: ['hero', 'about', 'skills', 'experience']
+    });
+
+    const handleContinue = () => {
+      scrollToSection(3); // Navegar a Experience (índice 3)
+    };
 
     useEffect(() => {
       const handleScroll = () => {
@@ -106,6 +115,17 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
               <SkillBox key={`${skill.name}-${index}`} skill={skill} />
             ))}
           </div>
+        </div>
+        
+        {/* Continue button */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <button
+            onClick={handleContinue}
+            className="flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300 cursor-pointer transition-colors group"
+          >
+            <span className="text-sm font-medium group-hover:text-gray-200 transition-colors">Continue</span>
+            <ChevronDown size={24} />
+          </button>
         </div>
       </section>
     );

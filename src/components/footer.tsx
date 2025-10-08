@@ -28,7 +28,7 @@ export const Footer = () => {
             
             // El footer se hace visible cuando se pasan las 2 pantallas iniciales (Hero + About)
             // Esto sucede cuando el scroll pasa las 2 pantallas iniciales
-            const shouldBeVisible = scrollY >= windowHeight * 2;
+            const shouldBeVisible = scrollY >= windowHeight * 3;
             
             setIsVisible(shouldBeVisible);
         };
