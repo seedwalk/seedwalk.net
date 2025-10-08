@@ -1,7 +1,9 @@
 "use client";
 
 import { Badge } from "./ui/badge";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion } from "motion/react";
+import { useInView } from "framer-motion";
 
 // Estructura de datos para las experiencias laborales
 interface ExperienceItem {
@@ -277,6 +279,137 @@ const experiences: ExperienceItem[] = [
     }
 ];
 
+// Componente animado para cada experiencia
+const AnimatedExperienceItem = ({ exp, index }: { exp: ExperienceItem, index: number }) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+    return (
+        <motion.div 
+            ref={ref}
+            key={exp.id} 
+            className="w-full" 
+            style={{ backgroundColor: index % 2 === 0 ? "var(--bg-2)" : "var(--bg-3)" }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            transition={{ 
+                duration: 0.6, 
+                ease: [0.25, 0.1, 0.25, 1], 
+                delay: 0.1 
+            }}
+        >
+            <div className="max-w-4xl mx-auto">
+                <div className="flex gap-8 pb-12 relative" style={{top: '-41px'}}>
+                    {/* Línea vertical de la timeline */}
+                    {index < experiences.length - 1 && (
+                        <div className="absolute left-10 top-16 w-0.5 bg-gray-300" style={{ height: index === experiences.length - 2 ? '100%' : 'calc(100% + 3rem)' }}></div>
+                    )}
+
+                    {/* Fecha */}
+                    <div className="flex-shrink-0 w-24">
+                        <Badge className="text-sm font-medium" style={{position: 'relative', top: 11}}>
+                            <div className="flex flex-col items-center justify-center gap-2 p-1">
+                                <span>{exp.startDate}</span>
+                                <span>{exp.endDate}</span>
+                            </div>
+                        </Badge>
+                    </div>
+
+                    {/* Contenido */}
+                    <motion.div 
+                        className="flex-1 px-6 flex flex-col gap-4"
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+                        transition={{ 
+                            duration: 0.6, 
+                            ease: [0.25, 0.1, 0.25, 1], 
+                            delay: 0.3 
+                        }}
+                    >
+                        {/* Logo de la empresa */}
+                        {exp.logo && (
+                            <motion.div 
+                                className="flex gap-4" 
+                                style={{ height: '80px' }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                                transition={{ 
+                                    duration: 0.5, 
+                                    ease: [0.25, 0.1, 0.25, 1], 
+                                    delay: 0.4 
+                                }}
+                            >
+                                <img
+                                    src={exp.logo}
+                                    alt={`${exp.company} logo`}
+                                    className="w-20 rounded-md object-contain"
+                                    onError={(e) => {
+                                        console.log('Error loading image:', exp.logo);
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                    onLoad={() => {
+                                        console.log('Successfully loaded image:', exp.logo);
+                                    }}
+                                />
+                                <div className="flex flex-col justify-end">
+                                    <h3 className="text-xl font-bold mb-1">{exp.company}</h3>
+                                    <p className="text-lg font-semibold mb-2">
+                                        {exp.position} / {exp.startDate} - {exp.endDate}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Descripción */}
+                        <motion.p 
+                            className="mb-4 leading-relaxed"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                            transition={{ 
+                                duration: 0.5, 
+                                ease: [0.25, 0.1, 0.25, 1], 
+                                delay: 0.5 
+                            }}
+                        >
+                            {exp.description}
+                        </motion.p>
+
+                        {/* Responsabilidades */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                            transition={{ 
+                                duration: 0.5, 
+                                ease: [0.25, 0.1, 0.25, 1], 
+                                delay: 0.6 
+                            }}
+                        >
+                            <h4 className="font-semibold mb-2">Responsabilities:</h4>
+                            <ul className="list-none list-outside pl-6 space-y-3">
+                                {exp.responsibilities.map((responsibility, idx) => (
+                                    <motion.li 
+                                        key={idx} 
+                                        className="relative before:content-['–'] before:absolute before:-left-4 text-sm"
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                                        transition={{ 
+                                            duration: 0.4, 
+                                            ease: [0.25, 0.1, 0.25, 1], 
+                                            delay: 0.7 + (idx * 0.05) 
+                                        }}
+                                    >
+                                        {responsibility}
+                                    </motion.li>
+                                ))}
+                            </ul>
+                        </motion.div>
+                    </motion.div>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
 export const Experience = () => {
     const [shouldHaveScreenHeight, setShouldHaveScreenHeight] = useState(true);
 
@@ -301,133 +434,120 @@ export const Experience = () => {
             style={{ backgroundColor: "var(--bg-2)" }}
         >
             <div className={`flex flex-col items-center justify-center ${shouldHaveScreenHeight ? 'h-full' : 'py-16 sm:py-20'} gap-6 sm:gap-10`}>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center px-4">Experience</h1>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center px-4 mb-10">Experience</h1>
 
-                {/* Desktop Timeline - mantiene el diseño original */}
+                {/* Desktop Timeline - con animaciones */}
                 <div className="hidden md:block w-full flex flex-col items-center justify-center">
                     {experiences.map((exp, index) => (
-                        <div key={exp.id} className="w-full" style={{ backgroundColor: index % 2 === 0 ? "var(--bg-2)" : "var(--bg-3)" }}>
-                            <div className="max-w-4xl mx-auto">
-                                <div className="flex gap-8  pb-12 relative" style={{top: '-41px'}}>
-                                     {/* Línea vertical de la timeline */}
-                                     {index < experiences.length - 1 && (
-                                         <div className="absolute left-10 top-16 w-0.5 bg-gray-300" style={{ height: index === experiences.length - 2 ? '100%' : 'calc(100% + 3rem)' }}></div>
-                                     )}
-
-                                    {/* Fecha */}
-                                    <div className="flex-shrink-0 w-24">
-                                        <Badge className="text-sm font-medium" style={{position: 'relative', top: 11}}>
-                                            <div className="flex flex-col items-center justify-center gap-2 p-1">
-                                            <span>{exp.startDate}</span>
-                                            
-                                             <span>{exp.endDate}</span>
-                                            </div>
-                                        </Badge>
-                                    </div>
-
-                                    {/* Contenido */}
-                                    <div className="flex-1  px-6 flex flex-col gap-4">
-                                        {/* Logo de la empresa */}
-                                        {exp.logo && (
-                                            <div className="flex gap-4" style={{ height: '80px' }}>
-                                                <img
-                                                    src={exp.logo}
-                                                    alt={`${exp.company} logo`}
-                                                    className="w-20 rounded-md  object-contain"
-                                                    onError={(e) => {
-
-                                                        console.log('Error loading image:', exp.logo);
-                                                        e.currentTarget.style.display = 'none';
-                                                    }}
-                                                    onLoad={() => {
-                                                        console.log('Successfully loaded image:', exp.logo);
-                                                    }}
-                                                />
-                                                <div className="flex flex-col justify-end">
-                                                    <h3 className="text-xl font-bold mb-1">{exp.company}</h3>
-                                                    <p className="text-lg font-semibold mb-2">
-                                                        {exp.position} / {exp.startDate} - {exp.endDate}
-                                                    </p>
-                                                </div>
-
-                                            </div>
-                                        )}
-
-
-                                        {/* Descripción */}
-                                        <p className=" mb-4 leading-relaxed">
-                                            {exp.description}
-                                        </p>
-
-                                        {/* Responsabilidades */}
-                                        <div>
-                                            <h4 className="font-semibold mb-2">Responsabilities:</h4>
-                                            <ul className="list-none list-outside pl-6 space-y-3">
-                                                {exp.responsibilities.map((responsibility, idx) => (
-                                                    <li key={idx} className="relative before:content-['–'] before:absolute before:-left-4 text-sm">
-                                                        {responsibility}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <AnimatedExperienceItem key={exp.id} exp={exp} index={index} />
                     ))}
                 </div>
 
-                {/* Mobile Layout - diseño simple y limpio */}
+                {/* Mobile Layout - con animaciones */}
                 <div className="md:hidden w-full max-w-4xl mx-auto px-4 space-y-6">
-                    {experiences.map((exp, index) => (
-                        <div key={exp.id} className="rounded-lg p-4 " style={{ backgroundColor: "var(--bg-3)" }}>
-                            {/* Header con logo y fechas */}
-                            <div className="flex items-center gap-3 mb-3">
-                                {exp.logo && (
-                                    <img
-                                        src={exp.logo}
-                                        alt={`${exp.company} logo`}
-                                        className="w-12 h-12 rounded object-contain"
-                                        onError={(e) => {
-                                            console.log('Error loading image:', exp.logo);
-                                            e.currentTarget.style.display = 'none';
-                                        }}
-                                    />
-                                )}
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-white">{exp.company}</h3>
-                                    <p className="text-sm text-gray-300">{exp.position}</p>
-                                </div>
-                                <div className="text-right">
-                                    <Badge className="text-xs">
-                                        <div className="flex flex-col gap-1">
-                                            <span>{exp.startDate}</span>
-                                            <span>{exp.endDate}</span>
-                                        </div>
-                                    </Badge>
-                                </div>
-                            </div>
+                    {experiences.map((exp, index) => {
+                        const ref = useRef(null);
+                        const isInView = useInView(ref, { once: true, margin: "-50px" });
+                        
+                        return (
+                            <motion.div 
+                                ref={ref}
+                                key={exp.id} 
+                                className="rounded-lg p-4" 
+                                style={{ backgroundColor: "var(--bg-3)" }}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                                transition={{ 
+                                    duration: 0.5, 
+                                    ease: [0.25, 0.1, 0.25, 1], 
+                                    delay: index * 0.1 
+                                }}
+                            >
+                                {/* Header con logo y fechas */}
+                                <motion.div 
+                                    className="flex items-center gap-3 mb-3"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                                    transition={{ 
+                                        duration: 0.4, 
+                                        ease: [0.25, 0.1, 0.25, 1], 
+                                        delay: 0.2 
+                                    }}
+                                >
+                                    {exp.logo && (
+                                        <img
+                                            src={exp.logo}
+                                            alt={`${exp.company} logo`}
+                                            className="w-12 h-12 rounded object-contain"
+                                            onError={(e) => {
+                                                console.log('Error loading image:', exp.logo);
+                                                e.currentTarget.style.display = 'none';
+                                            }}
+                                        />
+                                    )}
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-bold text-white">{exp.company}</h3>
+                                        <p className="text-sm text-gray-300">{exp.position}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <Badge className="text-xs">
+                                            <div className="flex flex-col gap-1">
+                                                <span>{exp.startDate}</span>
+                                                <span>{exp.endDate}</span>
+                                            </div>
+                                        </Badge>
+                                    </div>
+                                </motion.div>
 
-                            {/* Descripción */}
-                            <p className="text-sm text-gray-300 mb-3 leading-relaxed">
-                                {exp.description}
-                            </p>
+                                {/* Descripción */}
+                                <motion.p 
+                                    className="text-sm text-gray-300 mb-3 leading-relaxed"
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+                                    transition={{ 
+                                        duration: 0.4, 
+                                        ease: [0.25, 0.1, 0.25, 1], 
+                                        delay: 0.3 
+                                    }}
+                                >
+                                    {exp.description}
+                                </motion.p>
 
-                            {/* Responsabilidades - colapsables */}
-                            <details className="group">
-                                <summary className="text-sm font-semibold text-white cursor-pointer hover:text-gray-300 transition-colors">
-                                    Responsibilities ({exp.responsibilities.length})
-                                </summary>
-                                <ul className="mt-2 space-y-2 pl-4">
-                                    {exp.responsibilities.map((responsibility, idx) => (
-                                        <li key={idx} className="text-xs text-gray-400 leading-relaxed relative before:content-['•'] before:absolute before:-left-3 before:text-gray-500">
-                                            {responsibility}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </details>
-                        </div>
-                    ))}
+                                {/* Responsabilidades - colapsables */}
+                                <motion.details 
+                                    className="group"
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+                                    transition={{ 
+                                        duration: 0.4, 
+                                        ease: [0.25, 0.1, 0.25, 1], 
+                                        delay: 0.4 
+                                    }}
+                                >
+                                    <summary className="text-sm font-semibold text-white cursor-pointer hover:text-gray-300 transition-colors">
+                                        Responsibilities ({exp.responsibilities.length})
+                                    </summary>
+                                    <ul className="mt-2 space-y-2 pl-4">
+                                        {exp.responsibilities.map((responsibility, idx) => (
+                                            <motion.li 
+                                                key={idx} 
+                                                className="text-xs text-gray-400 leading-relaxed relative before:content-['•'] before:absolute before:-left-3 before:text-gray-500"
+                                                initial={{ opacity: 0, x: 10 }}
+                                                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
+                                                transition={{ 
+                                                    duration: 0.3, 
+                                                    ease: [0.25, 0.1, 0.25, 1], 
+                                                    delay: 0.5 + (idx * 0.02) 
+                                                }}
+                                            >
+                                                {responsibility}
+                                            </motion.li>
+                                        ))}
+                                    </ul>
+                                </motion.details>
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </div>
         </section>
