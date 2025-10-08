@@ -124,7 +124,7 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
 
     return (
       <section 
-        className={`${isFixed ? 'fixed top-0 left-0' : shouldScroll ? 'relative' : ''}  w-full z-2`}
+        className={`${isFixed ? 'fixed top-0 left-0' : shouldScroll ? 'relative' : ''}  w-full z-2 h-screen`}
         style={{ backgroundColor: "var(--bg-1)" }}
       >
         <div className="flex flex-col items-center justify-center py-16 sm:py-24 md:py-32 lg:py-40 gap-6 sm:gap-8 md:gap-10 max-w-6xl mx-auto px-4">
