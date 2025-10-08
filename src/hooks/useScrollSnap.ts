@@ -23,6 +23,17 @@ export const useScrollSnap = ({ sections, snapThreshold = 50 }: ScrollSnapConfig
       targetScrollY += 20;
     }
     
+    // Para MySkills (índice 2), asegurar que se posicione correctamente
+    // cuando se viene desde Experience
+    if (sectionIndex === 2) {
+      const currentScrollY = window.scrollY;
+      // Si venimos desde Experience (scrollY >= 3 * windowHeight)
+      if (currentScrollY >= windowHeight * 3) {
+        // Ir a la posición exacta de MySkills
+        targetScrollY = windowHeight * 2;
+      }
+    }
+    
     window.scrollTo({
       top: targetScrollY,
       behavior: 'smooth'
@@ -39,16 +50,21 @@ export const useScrollSnap = ({ sections, snapThreshold = 50 }: ScrollSnapConfig
   const handleWheel = (e: WheelEvent) => {
     const currentScrollY = window.scrollY;
     const windowHeight = window.innerHeight;
-    const currentSectionIndex = Math.round(currentScrollY / windowHeight);
-
+    
     // Si estamos scrolleando automáticamente, prevenir todo scroll nativo
     if (isScrolling) {
       e.preventDefault();
       return;
     }
 
+    // Calcular la sección actual considerando el offset de Experience
+    let currentSectionIndex = Math.round(currentScrollY / windowHeight);
+    if (currentScrollY >= windowHeight * 3) {
+      currentSectionIndex = Math.round((currentScrollY - 20) / windowHeight);
+    }
+
     // Si estamos en Experience (índice 3 o más), permitir scroll normal
-    if (currentSectionIndex >= 3) {
+    if (currentScrollY >= windowHeight * 3) {
       return;
     }
 
@@ -74,13 +90,19 @@ export const useScrollSnap = ({ sections, snapThreshold = 50 }: ScrollSnapConfig
     const currentScrollY = window.scrollY;
     const windowHeight = window.innerHeight;
     
-    // Ajustar para Experience que tiene 20px extra
-    let adjustedScrollY = currentScrollY;
+    // Calcular la sección actual
+    let newSectionIndex;
+    
     if (currentScrollY >= windowHeight * 3) {
-      adjustedScrollY = currentScrollY - 20;
+      // En Experience o más allá - permitir scroll libre
+      newSectionIndex = Math.round((currentScrollY - 20) / windowHeight);
+    } else {
+      // En las primeras 3 secciones (Hero, About, Skills)
+      newSectionIndex = Math.round(currentScrollY / windowHeight);
     }
     
-    const newSectionIndex = Math.round(adjustedScrollY / windowHeight);
+    // Asegurar que el índice esté dentro del rango válido
+    newSectionIndex = Math.max(0, Math.min(newSectionIndex, sections.length - 1));
     
     if (newSectionIndex !== currentSection) {
       setCurrentSection(newSectionIndex);

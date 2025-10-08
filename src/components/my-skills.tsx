@@ -38,20 +38,20 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
         backgroundColor: "var(--bg-2)",
         borderRadius: "10px"
       }} 
-      className="flex mr-4 flex-col items-center gap-2 hover:scale-105 transition-transform justify-around w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] p-3 sm:p-3 md:p-4"
+      className="flex mr-4 flex-col items-center gap-1 hover:scale-105 transition-transform justify-around w-[80px] h-[80px] sm:w-[85px] sm:h-[85px] md:w-[90px] md:h-[90px] p-2 sm:p-2 md:p-2"
     
     >
       <div style={{
         backgroundColor: skill.backgroundColor, 
         borderRadius: '10px', 
         display: skill.backgroundColor === 'transparent' ? 'none' : 'block'
-      }} className="p-1 sm:p-1.5 md:p-2">
+      }} className="p-1 sm:p-1 md:p-1">
         <Image
           src={`/assets/skills/${skill.filename}`}
           alt={skill.name}
           width={48}
           height={48}
-          className="object-contain w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10"
+          className="object-contain w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
         />
       </div>
       {skill.backgroundColor === 'transparent' && (
@@ -60,10 +60,10 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
           alt={skill.name}
           width={48}
           height={48}
-          className="object-contain w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10"
+          className="object-contain w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
         />
       )}
-      <span className="text-xs sm:text-xs md:text-sm text-center" style={{ color: "var(--text)" }}>
+      <span className="text-[10px] sm:text-[10px] md:text-xs text-center" style={{ color: "var(--text)" }}>
         {skill.name}
       </span>
     </div>
@@ -118,31 +118,32 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
 
     return (
       <section 
-        className={`${isFixed ? 'fixed top-0 left-0' : shouldScroll ? 'relative' : ''}  w-full z-2 h-screen`}
+        className={`${isFixed ? 'fixed top-0 left-0' : shouldScroll ? 'relative' : ''}  w-full z-2 min-h-screen`}
         style={{ backgroundColor: "var(--bg-1)" }}
       >
-        <div className="flex flex-col items-center justify-center py-16 sm:py-24 md:py-32 lg:py-40 gap-6 sm:gap-8 md:gap-10 px-4">
+        <div className="flex flex-col items-center justify-center h-full w-full gap-4 sm:gap-6 md:gap-8 px-4 min-h-screen">
           <motion.h1 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center mb-8"
             initial={{ opacity: 0, y: 50 }}
             animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
           >
             Skills
           </motion.h1>
+          
 
           <Marquee speed={50} direction="left">
-            {skills.map((skill, index) => (
+            {[...skills, ...skills].map((skill, index) => (
               <SkillBox key={`${skill.name}-${index}`} skill={skill} index={index} isInView={shouldAnimate} />
             ))}
           </Marquee>
           <Marquee speed={35} direction="right">
-            {skills.map((skill, index) => (
+            {[...skills, ...skills].map((skill, index) => (
               <SkillBox key={`${skill.name}-${index}`} skill={skill} index={index} isInView={shouldAnimate} />
             ))}
           </Marquee>
-          <Marquee speed={50} direction="left">
-            {skills.map((skill, index) => (
+          <Marquee speed={20} direction="left">
+            {[...skills, ...skills].map((skill, index) => (
               <SkillBox key={`${skill.name}-${index}`} skill={skill} index={index} isInView={shouldAnimate} />
             ))}
           </Marquee>
