@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useScrollSnap } from "@/hooks/useScrollSnap";
 
 export const Hero = () => {
-  const { scrollToSection } = useScrollSnap({
+  const { scrollToSection, currentSection } = useScrollSnap({
     sections: ['hero', 'about', 'skills', 'experience']
   });
 
@@ -12,11 +12,23 @@ export const Hero = () => {
     scrollToSection(1); // Navegar a About (índice 1)
   };
 
+  // Ocultar cuando hayamos pasado 2 secciones (skills = índice 2, experience = índice 3)
+  const shouldHide = currentSection >= 2;
+
   return (
     <motion.section
       initial={{ backgroundColor: "var(--bg-3)" }}
-      animate={{ backgroundColor: "var(--bg-1)" }}
-      transition={{ duration: 1.5, ease: [0.25, 0.1, 0.25, 1] }}
+      animate={{ 
+        backgroundColor: "var(--bg-1)",
+        opacity: shouldHide ? 0 : 1,
+        visibility: shouldHide ? "hidden" : "visible"
+      }}
+      transition={{ 
+        duration: 1.5, 
+        ease: [0.25, 0.1, 0.25, 1],
+        opacity: { duration: 0.5, ease: "easeInOut" },
+        visibility: { duration: 0 }
+      }}
       className="min-h-screen fixed top-0 left-0 w-full z-1"
     >
       <div className="flex flex-col items-center justify-center h-screen p-8 sm:p-16 md:p-24 lg:p-40 gap-6 sm:gap-8 md:gap-10">
