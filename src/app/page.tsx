@@ -1,6 +1,7 @@
 import { About } from "@/components/about";
 import { Experience } from "@/components/experience";
 import { MySkills } from "@/components/my-skills";
+import { Hero } from "@/components/hero";
 import { Mail, Github, Linkedin } from "lucide-react";
 
 const SocialIcons = () => {
@@ -25,14 +26,7 @@ const SocialIcons = () => {
 export default function Home() {
   return (
     <>
-      <section style={{ backgroundColor: "var(--bg-1)" }}>
-        <div className="flex flex-col items-center justify-center p-8 sm:p-16 md:p-24 lg:p-40 gap-6 sm:gap-8 md:gap-10">
-          <div className="flex flex-col items-center justify-center gap-2 text-center px-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">Federico Caramelli</h1>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl">Full-Stack Developer</h2>
-          </div>
-        </div>
-      </section>
+      <Hero />
       <About />
       <MySkills />
       <Experience />
