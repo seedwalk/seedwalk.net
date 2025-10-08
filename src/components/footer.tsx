@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 
 const SocialIcons = ({ showIcons }: { showIcons: boolean }) => {
     const icons = [
-        { href: "mailto:hola@tu.com", label: "Email", icon: Mail },
+        { href: "mailto:fede@seedwalk.net", label: "Email", icon: Mail },
         { href: "https://github.com/seedwalk", label: "GitHub", icon: Github },
         { href: "https://www.linkedin.com/in/federico-caramelli", label: "LinkedIn", icon: Linkedin }
     ];

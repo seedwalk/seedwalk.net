@@ -22,16 +22,18 @@ const experiences: ExperienceItem[] = [
     {
         id: "1",
         company: "Mevuelo",
-        position: "Senior Full Stack Developer",
+        position: "Lead Full Stack Developer",
         startDate: "Aug 2023",
         endDate: "Oct 2025",
-        description: "Desarrollo de aplicaciones web escalables y sistemas de gestión para la industria de viajes. Liderazgo técnico en proyectos críticos.",
+        description: "Led a cross-functional team of five developers in designing and building a comprehensive internal platform for MeVuelo. The system combined CRM capabilities, automated workflows, AI-driven process automation, and internal booking engines for both flights and hotels. I was responsible for turning the original concept into a tangible product, defining the technical architecture, and supervising UI/UX implementation, ensuring scalability, modularity, and maintainability across all services.",
         responsibilities: [
-            "Desarrollo full-stack con tecnologías modernas",
-            "Arquitectura de microservicios",
-            "Mentoría a desarrolladores junior",
-            "Optimización de performance",
-            "Integración de APIs de terceros"
+            "Architecture & Development: Designed and implemented a modular monorepo architecture using NestJS, React, and TypeScript, composed of multiple APIs (one per CRM client) along with shared flight and hotel services.",
+            "Technical Leadership: Managed and mentored a team of 5 developers, defined coding standards, reviewed pull requests, and ensured adherence to best practices across the stack.",
+            "Omnichannel CRM: Built an internal CRM system integrating WhatsApp, calls, and email channels to centralize customer interactions.",
+            "AI-Driven Automation: Designed and implemented intelligent workflows powered by AI, automating responses, case prioritization, and operational tasks.",
+            "Internal Booking Engine: Developed a custom flight and hotel booking engine, integrating internal APIs with external supplier data.",
+            "UI/UX Supervision: Oversaw and approved all UI/UX components and flows, ensuring design consistency and user-centered interfaces.",
+            "DevOps & Deployment: Managed CI/CD pipelines, versioning, and Dockerized deployments across AWS environments.",
         ],
         logo: "/assets/experience/mevuelo.jpeg"
         //logo: "/assets/experience/overactive.jpeg"
@@ -285,21 +287,21 @@ const AnimatedExperienceItem = ({ exp, index }: { exp: ExperienceItem, index: nu
     const isInView = useInView(ref, { once: true, margin: "-50px" });
 
     return (
-        <motion.div 
+        <motion.div
             ref={ref}
-            key={exp.id} 
-            className="w-full" 
+            key={exp.id}
+            className="w-full"
             style={{ backgroundColor: index % 2 === 0 ? "var(--bg-2)" : "var(--bg-3)" }}
             initial={{ opacity: 0, y: 50 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ 
-                duration: 0.6, 
-                ease: [0.25, 0.1, 0.25, 1], 
-                delay: 0.1 
+            transition={{
+                duration: 0.6,
+                ease: [0.25, 0.1, 0.25, 1],
+                delay: 0.1
             }}
         >
             <div className="max-w-4xl mx-auto">
-                <div className="flex gap-8 pb-12 relative" style={{top: '-41px'}}>
+                <div className="flex gap-8 pb-12 relative" style={{ top: '-41px' }}>
                     {/* Línea vertical de la timeline */}
                     {index < experiences.length - 1 && (
                         <div className="absolute left-10 top-16 w-0.5 bg-gray-300" style={{ height: index === experiences.length - 2 ? '100%' : 'calc(100% + 3rem)' }}></div>
@@ -307,7 +309,7 @@ const AnimatedExperienceItem = ({ exp, index }: { exp: ExperienceItem, index: nu
 
                     {/* Fecha */}
                     <div className="flex-shrink-0 w-24">
-                        <Badge className="text-sm font-medium" style={{position: 'relative', top: 11}}>
+                        <Badge className="text-sm font-medium" style={{ position: 'relative', top: 11 }}>
                             <div className="flex flex-col items-center justify-center gap-2 p-1">
                                 <span>{exp.startDate}</span>
                                 <span>{exp.endDate}</span>
@@ -316,27 +318,27 @@ const AnimatedExperienceItem = ({ exp, index }: { exp: ExperienceItem, index: nu
                     </div>
 
                     {/* Contenido */}
-                    <motion.div 
+                    <motion.div
                         className="flex-1 px-6 flex flex-col gap-4"
                         initial={{ opacity: 0, x: 30 }}
                         animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-                        transition={{ 
-                            duration: 0.6, 
-                            ease: [0.25, 0.1, 0.25, 1], 
-                            delay: 0.3 
+                        transition={{
+                            duration: 0.6,
+                            ease: [0.25, 0.1, 0.25, 1],
+                            delay: 0.3
                         }}
                     >
                         {/* Logo de la empresa */}
                         {exp.logo && (
-                            <motion.div 
-                                className="flex gap-4" 
+                            <motion.div
+                                className="flex gap-4"
                                 style={{ height: '80px' }}
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                                transition={{ 
-                                    duration: 0.5, 
-                                    ease: [0.25, 0.1, 0.25, 1], 
-                                    delay: 0.4 
+                                transition={{
+                                    duration: 0.5,
+                                    ease: [0.25, 0.1, 0.25, 1],
+                                    delay: 0.4
                                 }}
                             >
                                 <img
@@ -361,14 +363,14 @@ const AnimatedExperienceItem = ({ exp, index }: { exp: ExperienceItem, index: nu
                         )}
 
                         {/* Descripción */}
-                        <motion.p 
+                        <motion.p
                             className="mb-4 leading-relaxed"
                             initial={{ opacity: 0, y: 20 }}
                             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                            transition={{ 
-                                duration: 0.5, 
-                                ease: [0.25, 0.1, 0.25, 1], 
-                                delay: 0.5 
+                            transition={{
+                                duration: 0.5,
+                                ease: [0.25, 0.1, 0.25, 1],
+                                delay: 0.5
                             }}
                         >
                             {exp.description}
@@ -378,24 +380,24 @@ const AnimatedExperienceItem = ({ exp, index }: { exp: ExperienceItem, index: nu
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                            transition={{ 
-                                duration: 0.5, 
-                                ease: [0.25, 0.1, 0.25, 1], 
-                                delay: 0.6 
+                            transition={{
+                                duration: 0.5,
+                                ease: [0.25, 0.1, 0.25, 1],
+                                delay: 0.6
                             }}
                         >
                             <h4 className="font-semibold mb-2">Responsabilities:</h4>
                             <ul className="list-none list-outside pl-6 space-y-3">
                                 {exp.responsibilities.map((responsibility, idx) => (
-                                    <motion.li 
-                                        key={idx} 
+                                    <motion.li
+                                        key={idx}
                                         className="relative before:content-['–'] before:absolute before:-left-4 text-sm"
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-                                        transition={{ 
-                                            duration: 0.4, 
-                                            ease: [0.25, 0.1, 0.25, 1], 
-                                            delay: 0.7 + (idx * 0.05) 
+                                        transition={{
+                                            duration: 0.4,
+                                            ease: [0.25, 0.1, 0.25, 1],
+                                            delay: 0.7 + (idx * 0.05)
                                         }}
                                     >
                                         {responsibility}
@@ -417,10 +419,10 @@ export const Experience = () => {
         const handleScroll = () => {
             const scrollY = window.scrollY;
             const windowHeight = window.innerHeight;
-            
+
             // Cuando MySkills se vuelve relative (después de 2 pantallas)
             const mySkillsShouldScroll = scrollY >= windowHeight * 2;
-            
+
             setShouldHaveScreenHeight(!mySkillsShouldScroll);
         };
 
@@ -429,7 +431,7 @@ export const Experience = () => {
     }, []);
 
     return (
-        <section 
+        <section
             className={`relative z-4 ${shouldHaveScreenHeight ? 'mt-[100vh]' : ''}`}
             style={{ backgroundColor: "var(--bg-2)" }}
         >
@@ -448,30 +450,30 @@ export const Experience = () => {
                     {experiences.map((exp, index) => {
                         const ref = useRef(null);
                         const isInView = useInView(ref, { once: true, margin: "-50px" });
-                        
+
                         return (
-                            <motion.div 
+                            <motion.div
                                 ref={ref}
-                                key={exp.id} 
-                                className="rounded-lg p-4" 
+                                key={exp.id}
+                                className="rounded-lg p-4"
                                 style={{ backgroundColor: "var(--bg-3)" }}
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                                transition={{ 
-                                    duration: 0.5, 
-                                    ease: [0.25, 0.1, 0.25, 1], 
-                                    delay: index * 0.1 
+                                transition={{
+                                    duration: 0.5,
+                                    ease: [0.25, 0.1, 0.25, 1],
+                                    delay: index * 0.1
                                 }}
                             >
                                 {/* Header con logo y fechas */}
-                                <motion.div 
+                                <motion.div
                                     className="flex items-center gap-3 mb-3"
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                                    transition={{ 
-                                        duration: 0.4, 
-                                        ease: [0.25, 0.1, 0.25, 1], 
-                                        delay: 0.2 
+                                    transition={{
+                                        duration: 0.4,
+                                        ease: [0.25, 0.1, 0.25, 1],
+                                        delay: 0.2
                                     }}
                                 >
                                     {exp.logo && (
@@ -500,28 +502,28 @@ export const Experience = () => {
                                 </motion.div>
 
                                 {/* Descripción */}
-                                <motion.p 
+                                <motion.p
                                     className="text-sm text-gray-300 mb-3 leading-relaxed"
                                     initial={{ opacity: 0, y: 15 }}
                                     animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-                                    transition={{ 
-                                        duration: 0.4, 
-                                        ease: [0.25, 0.1, 0.25, 1], 
-                                        delay: 0.3 
+                                    transition={{
+                                        duration: 0.4,
+                                        ease: [0.25, 0.1, 0.25, 1],
+                                        delay: 0.3
                                     }}
                                 >
                                     {exp.description}
                                 </motion.p>
 
                                 {/* Responsabilidades - colapsables */}
-                                <motion.details 
+                                <motion.details
                                     className="group"
                                     initial={{ opacity: 0, y: 15 }}
                                     animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-                                    transition={{ 
-                                        duration: 0.4, 
-                                        ease: [0.25, 0.1, 0.25, 1], 
-                                        delay: 0.4 
+                                    transition={{
+                                        duration: 0.4,
+                                        ease: [0.25, 0.1, 0.25, 1],
+                                        delay: 0.4
                                     }}
                                 >
                                     <summary className="text-sm font-semibold text-white cursor-pointer hover:text-gray-300 transition-colors">
@@ -529,15 +531,15 @@ export const Experience = () => {
                                     </summary>
                                     <ul className="mt-2 space-y-2 pl-4">
                                         {exp.responsibilities.map((responsibility, idx) => (
-                                            <motion.li 
-                                                key={idx} 
+                                            <motion.li
+                                                key={idx}
                                                 className="text-xs text-gray-400 leading-relaxed relative before:content-['•'] before:absolute before:-left-3 before:text-gray-500"
                                                 initial={{ opacity: 0, x: 10 }}
                                                 animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
-                                                transition={{ 
-                                                    duration: 0.3, 
-                                                    ease: [0.25, 0.1, 0.25, 1], 
-                                                    delay: 0.5 + (idx * 0.02) 
+                                                transition={{
+                                                    duration: 0.3,
+                                                    ease: [0.25, 0.1, 0.25, 1],
+                                                    delay: 0.5 + (idx * 0.02)
                                                 }}
                                             >
                                                 {responsibility}

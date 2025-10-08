@@ -1,0 +1,19 @@
+{
+  "name": "Federico Caramelli - Full-Stack Developer",
+  "short_name": "Fede CV",
+  "description": "Full-stack developer with strong experience in NestJS, React/TypeScript, AWS, PostgreSQL & microservices",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["portfolio", "developer", "cv"],
+  "lang": "en"
+}
