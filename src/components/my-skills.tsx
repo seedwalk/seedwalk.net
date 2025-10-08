@@ -1,4 +1,6 @@
+"use client";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const skills = [
     { name: "HTML5", filename: "html-5.png", backgroundColor: "white" },
@@ -63,8 +65,33 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
   
   
   export const MySkills = () => {
+    const [isFixed, setIsFixed] = useState(false);
+    const [shouldScroll, setShouldScroll] = useState(false);
+
+    useEffect(() => {
+      const handleScroll = () => {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        // Cuando el scroll pasa la primera pantalla (Hero)
+        const shouldBeFixed = scrollY >= windowHeight;
+        
+        // Cuando el scroll llega al final de About (Hero + About = 2 * windowHeight)
+        const shouldStartScrolling = scrollY >= windowHeight * 2;
+        
+        setIsFixed(shouldBeFixed && !shouldStartScrolling);
+        setShouldScroll(shouldStartScrolling);
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
-      <section style={{ backgroundColor: "var(--bg-1)" }}>
+      <section 
+        className={`${isFixed ? 'fixed top-0 left-0' : shouldScroll ? 'relative' : ''}  w-full z-2`}
+        style={{ backgroundColor: "var(--bg-1)" }}
+      >
         <div className="flex flex-col items-center justify-center py-16 sm:py-24 md:py-32 lg:py-40 gap-6 sm:gap-8 md:gap-10 max-w-6xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center">Skills</h1>
           {/* Desktop layout - mantiene el diseño original */}

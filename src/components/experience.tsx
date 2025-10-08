@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "./ui/badge";
+import { useEffect, useState } from "react";
 
 // Estructura de datos para las experiencias laborales
 interface ExperienceItem {
@@ -277,9 +278,29 @@ const experiences: ExperienceItem[] = [
 ];
 
 export const Experience = () => {
+    const [shouldHaveScreenHeight, setShouldHaveScreenHeight] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+            
+            // Cuando MySkills se vuelve relative (después de 2 pantallas)
+            const mySkillsShouldScroll = scrollY >= windowHeight * 2;
+            
+            setShouldHaveScreenHeight(!mySkillsShouldScroll);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
-        <section style={{ backgroundColor: "var(--bg-2)" }}>
-            <div className="flex flex-col items-center justify-center py-16 sm:py-20 gap-6 sm:gap-10">
+        <section 
+            className={`relative z-4 ${shouldHaveScreenHeight ? 'mt-[100vh]' : ''}`}
+            style={{ backgroundColor: "var(--bg-2)" }}
+        >
+            <div className={`flex flex-col items-center justify-center ${shouldHaveScreenHeight ? 'h-full' : 'py-16 sm:py-20'} gap-6 sm:gap-10`}>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center px-4">Experience</h1>
 
                 {/* Desktop Timeline - mantiene el diseño original */}
