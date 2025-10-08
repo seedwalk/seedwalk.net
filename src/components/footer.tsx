@@ -63,13 +63,16 @@ const RevealedText = ({ text, revealedChars, className }: { text: string; reveal
 export const Footer = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [revealedChars, setRevealedChars] = useState(0);
-    const [revealedSubChars, setRevealedSubChars] = useState(0);
+    const [revealedSub1Chars, setRevealedSub1Chars] = useState(0);
+    const [revealedSub2Chars, setRevealedSub2Chars] = useState(0);
     const [isRevealing, setIsRevealing] = useState(false);
-    const [isRevealingSubText, setIsRevealingSubText] = useState(false);
+    const [isRevealingSub1, setIsRevealingSub1] = useState(false);
+    const [isRevealingSub2, setIsRevealingSub2] = useState(false);
     const [showSocialIcons, setShowSocialIcons] = useState(false);
     
     const fullText = "Thank you for your time!";
-    const subText = "If you have any questions or would like to get in touch, please feel free to contact me.";
+    const subText1 = "If you have any questions or would like to get in touch";
+    const subText2 = "feel free to contact me.";
 
     useEffect(() => {
         const handleScroll = () => {
@@ -93,10 +96,12 @@ export const Footer = () => {
             console.log("Footer is visible, starting reveal effect");
             setIsRevealing(true);
             setRevealedChars(0);
-            setRevealedSubChars(0);
+            setRevealedSub1Chars(0);
+            setRevealedSub2Chars(0);
             
             // Pequeño delay para que sea más visible
             setTimeout(() => {
+                // 1. Revelar fullText
                 let currentIndex = 0;
                 const revealInterval = setInterval(() => {
                     if (currentIndex < fullText.length) {
@@ -106,30 +111,45 @@ export const Footer = () => {
                         clearInterval(revealInterval);
                         setIsRevealing(false);
                         
-                        // Iniciar el segundo reveal después de un pequeño delay
+                        // 2. Iniciar subText1 después de un delay
                         setTimeout(() => {
-                            setIsRevealingSubText(true);
-                            let subCurrentIndex = 0;
-                            const subRevealInterval = setInterval(() => {
-                                if (subCurrentIndex < subText.length) {
-                                    setRevealedSubChars(subCurrentIndex + 1);
-                                    subCurrentIndex++;
+                            setIsRevealingSub1(true);
+                            let sub1CurrentIndex = 0;
+                            const sub1RevealInterval = setInterval(() => {
+                                if (sub1CurrentIndex < subText1.length) {
+                                    setRevealedSub1Chars(sub1CurrentIndex + 1);
+                                    sub1CurrentIndex++;
                                 } else {
-                                    clearInterval(subRevealInterval);
-                                    setIsRevealingSubText(false);
+                                    clearInterval(sub1RevealInterval);
+                                    setIsRevealingSub1(false);
                                     
-                                    // Mostrar los social icons después de que termine el segundo texto
+                                    // 3. Iniciar subText2 después de un delay
                                     setTimeout(() => {
-                                        setShowSocialIcons(true);
-                                    }, 300);
+                                        setIsRevealingSub2(true);
+                                        let sub2CurrentIndex = 0;
+                                        const sub2RevealInterval = setInterval(() => {
+                                            if (sub2CurrentIndex < subText2.length) {
+                                                setRevealedSub2Chars(sub2CurrentIndex + 1);
+                                                sub2CurrentIndex++;
+                                            } else {
+                                                clearInterval(sub2RevealInterval);
+                                                setIsRevealingSub2(false);
+                                                
+                                                // 4. Mostrar los social icons después de que termine todo
+                                                setTimeout(() => {
+                                                    setShowSocialIcons(true);
+                                                }, 300);
+                                            }
+                                        }, 30); // Velocidad para subText2
+                                    }, 500); // Delay entre subText1 y subText2
                                 }
-                            }, 30); // Velocidad más rápida para el subtítulo
-                        }, 500); // Delay de 500ms entre textos
+                            }, 30); // Velocidad para subText1
+                        }, 500); // Delay entre fullText y subText1
                     }
-                }, 100); // Velocidad de revelado: 100ms por carácter
+                }, 100); // Velocidad de revelado para fullText: 100ms por carácter
             }, 300); // Delay inicial de 300ms
         }
-    }, [isVisible, fullText, subText]);
+    }, [isVisible, fullText, subText1, subText2]);
 
     return (
         <section 
@@ -147,13 +167,19 @@ export const Footer = () => {
                     className=""
                 />
               </h1>
-              <p className="text-center text-sm sm:text-base md:text-lg min-h-[1.5em]">
-                <RevealedText 
-                    text={subText} 
-                    revealedChars={revealedSubChars} 
-                    className=""
-                />
-              </p>
+                <p className="text-center text-sm sm:text-base md:text-lg min-h-[1.5em]">
+                 <RevealedText 
+                     text={subText1} 
+                     revealedChars={revealedSub1Chars} 
+                     className=""
+                 />
+                 <br />
+                 <RevealedText 
+                     text={subText2} 
+                     revealedChars={revealedSub2Chars} 
+                     className=""
+                 />
+                </p>
               <SocialIcons showIcons={showSocialIcons} />
             </div>
         </section>
