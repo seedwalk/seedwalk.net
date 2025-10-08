@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion } from "motion/react";
+import { useInView } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useScrollSnap } from "@/hooks/useScrollSnap";
 
@@ -30,13 +32,21 @@ const skills = [
     { name: "Docker", filename: "docker.svg", backgroundColor: "white" }
   ];
 
-const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgroundColor: string } }) => (
-    <div style={
-      {
+const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename: string; backgroundColor: string }, index: number, isInView: boolean }) => (
+    <motion.div 
+      style={{
         backgroundColor: "var(--bg-2)",
         borderRadius: "10px"
       }} 
-      className="flex flex-col items-center gap-2 hover:scale-105 transition-transform justify-around w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] p-3 sm:p-3 md:p-4">
+      className="flex flex-col items-center gap-2 hover:scale-105 transition-transform justify-around w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] p-3 sm:p-3 md:p-4"
+      initial={{ opacity: 0, y: 30, scale: 0.8 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.8 }}
+      transition={{ 
+        duration: 0.5, 
+        ease: [0.25, 0.1, 0.25, 1], 
+        delay: index * 0.05 
+      }}
+    >
       <div style={{
         backgroundColor: skill.backgroundColor, 
         borderRadius: '10px', 
@@ -62,13 +72,14 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
       <span className="text-xs sm:text-xs md:text-sm text-center" style={{ color: "var(--text)" }}>
         {skill.name}
       </span>
-    </div>
+    </motion.div>
   )
   
   
   export const MySkills = () => {
     const [isFixed, setIsFixed] = useState(false);
     const [shouldScroll, setShouldScroll] = useState(false);
+    const [shouldAnimate, setShouldAnimate] = useState(false);
     const { scrollToSection } = useScrollSnap({
       sections: ['hero', 'about', 'skills', 'experience']
     });
@@ -90,6 +101,21 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
         
         setIsFixed(shouldBeFixed && !shouldStartScrolling);
         setShouldScroll(shouldStartScrolling);
+
+        // Detectar cuando About está en viewport para animar Skills
+        const sections = document.getElementsByTagName('section');
+        if (sections.length >= 2) {
+          const aboutSection = sections[1]; // About es el segundo section
+          const aboutRect = aboutSection.getBoundingClientRect();
+          const aboutHeight = aboutSection.offsetHeight;
+          
+          // Animar Skills cuando About está completamente visible
+          // About está visible cuando su top está en la parte superior de la pantalla
+          const isAboutInView = aboutRect.top <= 0 && aboutRect.bottom >= aboutHeight;
+          
+          // Invertir la lógica: animar cuando About NO está visible (Skills está visible)
+          setShouldAnimate(!isAboutInView);
+        }
       };
 
       window.addEventListener('scroll', handleScroll);
@@ -102,17 +128,24 @@ const SkillBox = ({ skill }: { skill: { name: string; filename: string; backgrou
         style={{ backgroundColor: "var(--bg-1)" }}
       >
         <div className="flex flex-col items-center justify-center py-16 sm:py-24 md:py-32 lg:py-40 gap-6 sm:gap-8 md:gap-10 max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center">Skills</h1>
+          <motion.h1 
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center"
+            initial={{ opacity: 0, y: 50 }}
+            animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+          >
+            Skills
+          </motion.h1>
           {/* Desktop layout - mantiene el diseño original */}
           <div className="hidden sm:flex flex-wrap gap-4 w-full justify-center">
             {skills.map((skill, index) => (
-              <SkillBox key={`${skill.name}-${index}`} skill={skill} />
+              <SkillBox key={`${skill.name}-${index}`} skill={skill} index={index} isInView={shouldAnimate} />
             ))}
           </div>
           {/* Mobile layout - flex más compacto */}
           <div className="sm:hidden flex flex-wrap gap-3 w-full justify-center">
             {skills.map((skill, index) => (
-              <SkillBox key={`${skill.name}-${index}`} skill={skill} />
+              <SkillBox key={`${skill.name}-${index}`} skill={skill} index={index} isInView={shouldAnimate} />
             ))}
           </div>
         </div>
