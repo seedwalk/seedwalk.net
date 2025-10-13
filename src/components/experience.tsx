@@ -107,7 +107,7 @@ const experiences: ExperienceItem[] = [
         position: "Senior Frontend Developer",
         startDate: "Sep 2018",
         endDate: "Jul 2019",
-        description: "As a Senior Frontend Developer at Blue Trail Software, my role involved working with clients and delivering custom-made solutions. I collaborated with clients such as Abbot, Amgen, Astellas, Bayer, and Merck. Key responsibilities included:",
+        description: "As a Senior Frontend Developer at Blue Trail Software, my role involved working with clients and delivering custom-made solutions. Key responsibilities included:",
         responsibilities: [
             "Architecting and developing front-end solutions using technologies such as React, Redux, and TypeScript.",
             "Collaborating closely with clients to understand their business requirements and translate them into technical specifications.",
@@ -170,7 +170,7 @@ const experiences: ExperienceItem[] = [
         position: "Web UI Developer",
         startDate: "Nov 2016",
         endDate: "Dev 2017",
-        description: "As a Software Developer at Globant, I worked on various projects for clients such as Google, Disney, and Rockwell Automation. Key responsibilities included:",
+        description: "As a Software Developer at Globant, I worked on the Santander Openbank project. Key responsibilities included:",
         responsibilities: [
             "Collaborating closely with cross-functional teams, including product managers, designers, and backend developers, to understand project requirements and deliver high-quality software solutions.",
             "Developing front-end interfaces using technologies such as React, Angular, and TypeScript.",
@@ -210,11 +210,11 @@ const experiences: ExperienceItem[] = [
         position: "Full Stack Developer",
         startDate: "Dec 2014",
         endDate: "Mar 2016",
-        description: "As a Software Developer at Yamagroup, I worked on developing web applications for clients in various industries. Key responsibilities included:",
+        description: "As a Software Developer at Yamagroup, I worked on developing web applications for clients within the medical industry. I colaborated with brands such as Amgen, Abbot, Abbie, Astellas, Bayer, Merck, among others. Key responsibilities included:",
         responsibilities: [
             "Collaborating with clients to gather requirements, understand their business needs, and translate them into technical solutions.",
             "Developing front-end interfaces using technologies such as HTML, CSS, JavaScript, and frameworks like React and Angular.",
-            "Implementing backend functionalities using languages such as Java, Python, or PHP, and frameworks like Spring or Django.",
+            "Implementing backend functionalities using languages such as Node.js or PHP, and frameworks like Express or Laravel.",
             "Designing and optimizing databases to ensure efficient data storage, retrieval, and processing.",
             "Conducting code reviews, ensuring adherence to coding standards, best practices, and security guidelines.",
             "Troubleshooting and resolving technical issues, performing bug fixes, and ensuring smooth operation of the applications.",
