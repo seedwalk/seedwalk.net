@@ -86,7 +86,7 @@ const experiences: ExperienceItem[] = [
         id: "4",
         company: "Overactive",
         position: "Senior UI Software Designer",
-        startDate: "Jun 2919",
+        startDate: "Jun 2019",
         endDate: "Jul 2020",
         description: "As a Senior UI Software Designer at Overactive, I was responsible for designing solutions for customers. I worked on two successful projects, Experian Health’s Patient Simple app and MedicalSolutions portal. Key responsibilities included:",
         responsibilities: [
@@ -193,7 +193,7 @@ const experiences: ExperienceItem[] = [
         description: "As a Full Stack Developer at The Story Room, I played a pivotal role in developing custom solutions for clients. Key responsibilities included:",
         responsibilities: [
             "Collaborating closely with clients to understand their business requirements and translating them into technical solutions.",
-            "Developing full stack applications using technologies such as React, Node.js, and databases like MongoDB or PostgreSQL.",
+            "Developing full stack applications using technologies such as Wordpress, PHP, Laravel and databases like MongoDB or PostgreSQL.",
             "Implementing RESTful APIs and backend services to support the functionality of the applications.",
             "Utilizing modern frontend frameworks like React and Angular to create intuitive and responsive user interfaces.",
             "Collaborating with designers to implement visually appealing and user-friendly interfaces, ensuring a seamless user experience.",
@@ -213,7 +213,7 @@ const experiences: ExperienceItem[] = [
         description: "As a Software Developer at Yamagroup, I worked on developing web applications for clients within the medical industry. I colaborated with brands such as Amgen, Abbot, Abbie, Astellas, Bayer, Merck, among others. Key responsibilities included:",
         responsibilities: [
             "Collaborating with clients to gather requirements, understand their business needs, and translate them into technical solutions.",
-            "Developing front-end interfaces using technologies such as HTML, CSS, JavaScript, and frameworks like React and Angular.",
+            "Developing front-end interfaces using technologies such as HTML, CSS, JavaScript, and frameworks like JQuery.",
             "Implementing backend functionalities using languages such as Node.js or PHP, and frameworks like Express or Laravel.",
             "Designing and optimizing databases to ensure efficient data storage, retrieval, and processing.",
             "Conducting code reviews, ensuring adherence to coding standards, best practices, and security guidelines.",
@@ -232,7 +232,7 @@ const experiences: ExperienceItem[] = [
         description: "As a Full Stack Developer at Innvenio, I was involved in developing and maintaining web applications for clients. Key responsibilities included:",
         responsibilities: [
             "Collaborating with clients to understand their requirements, objectives, and business needs.",
-            "Developing full stack applications using technologies such as React, Node.js, and databases like MongoDB or MySQL.",
+            "Developing full stack applications using technologies such as Wordpress, PHP, and databases like MariaDB or MySQL.",
             "Implementing RESTful APIs and backend services to support the functionality of the applications.",
             "Creating intuitive and visually appealing user interfaces using HTML, CSS, and JavaScript frameworks.",
             "Conducting code reviews, ensuring adherence to coding standards, best practices, and security guidelines.",
