@@ -20,6 +20,25 @@ interface ExperienceItem {
 // Experiencias laborales ordenadas de más nuevo a más viejo
 const experiences: ExperienceItem[] = [
     {
+        id: "0",
+        company: "TramCase",
+        position: "Senior Software Engineer",
+        startDate: "Oct 2025",
+        endDate: "Present",
+        description: "Own end-to-end delivery of product initiatives, from PRD analysis to production deployment, within an AI-driven legal platform. Responsible for translating product requirements into scalable architecture, leading implementation, and ensuring high-quality, iterative releases that deliver real business value.",
+        responsibilities: [
+            "Product-Driven Development: Analyze PRDs, challenge assumptions, and define technical approach to deliver features efficiently while balancing speed, quality, and long-term maintainability.",
+            "Architecture & System Design: Design and evolve backend systems using Django, PostgreSQL, Redis, and real-time communication layers (WebSockets/SSE), ensuring scalability across multi-replica environments.",
+            "Feature Ownership (End-to-End): Lead implementation from backend to frontend integration, including API design, data modeling, and delivery under feature flags for safe iteration.",
+            "AI Integration: Leverage AI across workflows and development processes, integrating automation into product features and using LLM-assisted development to accelerate delivery.",
+            "Code Quality & PR Flow: Maintain high engineering standards through PR reviews, small iterative changes, and improving team workflows (merge queues, CI/CD, release practices).",
+            "Observability & Reliability: Implement structured logging, monitoring, and alerting (Datadog, OpenTelemetry) to ensure system reliability and fast issue detection in production.",
+            "Real-Time Systems: Design and maintain real-time communication infrastructure (Socket.IO, Redis pub/sub) to support multi-user, multi-session environments at scale.",
+            "Collaboration & Leadership: Work closely with product and stakeholders, drive technical decisions, and contribute to team processes such as grooming, sprint planning, and release management.",
+        ],
+        logo: "/assets/experience/tramcase_logo.jpeg"
+    },
+    {
         id: "1",
         company: "Mevuelo",
         position: "Lead Full Stack Developer",

@@ -29,7 +29,9 @@ const skills = [
     { name: "PHP", filename: "php.svg", backgroundColor: "white" },
     { name: "Unity", filename: "unity.svg", backgroundColor: "white" },
     { name: "Laravel", filename: "laravel.svg", backgroundColor: "white" },
-    { name: "Docker", filename: "docker.svg", backgroundColor: "white" }
+    { name: "Docker", filename: "docker.svg", backgroundColor: "white" },
+    { name: "Cursor", filename: "Cursor_logo.png", backgroundColor: "white" },
+    { name: "Claude", filename: "claude.jpeg", backgroundColor: "white" }
   ];
 
 const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename: string; backgroundColor: string }, index: number, isInView: boolean }) => (
