@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 
@@ -51,15 +51,6 @@ export const metadata: Metadata = {
     description: "Full-stack developer with strong experience in NestJS, React/TypeScript, AWS, PostgreSQL & microservices. Open to new opportunities",
     creator: "@federicocaramelli",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
@@ -68,6 +59,16 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://seedwalk.net",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default function RootLayout({
