@@ -4,7 +4,13 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "motion/react";
 import Marquee from "react-fast-marquee";
 import { ChevronDown } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useScrollSnap } from "@/hooks/useScrollSnap";
+
+const ParticleField = dynamic(
+  () => import("./particle-field").then((m) => m.ParticleField),
+  { ssr: false }
+);
 
 const skills = [
     { name: "HTML5", filename: "html-5.png", backgroundColor: "white" },
@@ -74,9 +80,8 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
   
   export const MySkills = () => {
     const [isFixed, setIsFixed] = useState(false);
-    const [shouldScroll, setShouldScroll] = useState(false);
     const [shouldAnimate, setShouldAnimate] = useState(false);
-    const { scrollToSection } = useScrollSnap({
+    const { scrollToSection, currentSection } = useScrollSnap({
       sections: ['hero', 'about', 'skills', 'experience']
     });
 
@@ -96,7 +101,6 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
         const shouldStartScrolling = scrollY >= windowHeight * 2;
         
         setIsFixed(shouldBeFixed && !shouldStartScrolling);
-        setShouldScroll(shouldStartScrolling);
 
         // Detectar cuando About está en viewport para animar Skills
         const sections = document.getElementsByTagName('section');
@@ -120,10 +124,11 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
 
     return (
       <section 
-        className={`${isFixed ? 'fixed top-0 left-0' : shouldScroll ? 'relative' : ''}  w-full z-2 min-h-screen`}
+        className={`${isFixed ? 'fixed top-0 left-0' : 'relative'} w-full z-2 min-h-screen overflow-hidden`}
         style={{ backgroundColor: "var(--bg-1)" }}
       >
-        <div className="flex flex-col items-center justify-center h-full w-full gap-4 sm:gap-6 md:gap-8 px-4 min-h-screen">
+        <ParticleField active={currentSection === 2} intro={false} />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full gap-4 sm:gap-6 md:gap-8 px-4 min-h-screen">
           <motion.h1 
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center mb-8"
             initial={{ opacity: 0, y: 50 }}
@@ -153,7 +158,7 @@ const SkillBox = ({ skill, index, isInView }: { skill: { name: string; filename:
         </div>
         
         {/* Continue button */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <div className="absolute z-10 bottom-8 left-1/2 transform -translate-x-1/2">
           <button
             onClick={handleContinue}
             className="flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300 cursor-pointer transition-colors group"

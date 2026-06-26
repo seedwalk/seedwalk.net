@@ -1,7 +1,13 @@
 "use client";
 import { motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useScrollSnap } from "@/hooks/useScrollSnap";
+
+const ParticleField = dynamic(
+  () => import("./particle-field").then((m) => m.ParticleField),
+  { ssr: false }
+);
 
 export const Hero = () => {
   const { scrollToSection, currentSection } = useScrollSnap({
@@ -29,9 +35,10 @@ export const Hero = () => {
         opacity: { duration: 0.5, ease: "easeInOut" },
         visibility: { duration: 0 }
       }}
-      className="min-h-screen fixed top-0 left-0 w-full z-1"
+      className="min-h-screen fixed top-0 left-0 w-full z-1 overflow-hidden"
     >
-      <div className="flex flex-col items-center justify-center h-screen p-8 sm:p-16 md:p-24 lg:p-40 gap-6 sm:gap-8 md:gap-10">
+      <ParticleField active={!shouldHide} />
+      <div className="relative z-10 flex flex-col items-center justify-center h-screen p-8 sm:p-16 md:p-24 lg:p-40 gap-6 sm:gap-8 md:gap-10">
         <div className="flex flex-col items-center justify-center gap-8 text-center px-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
             <motion.span
@@ -88,7 +95,7 @@ export const Hero = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 5.0 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          className="absolute z-10 bottom-8 left-1/2 transform -translate-x-1/2"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
