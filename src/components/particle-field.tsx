@@ -6,11 +6,11 @@ import * as THREE from "three";
 interface ParticleFieldProps {
   /** Cuando es false se pausa el render loop (sección oculta) para no gastar GPU. */
   active?: boolean;
-  /** Si es false, las partículas ya están en su lugar (sin animación de entrada). */
+  /** Si es false, la red ya está armada (sin animación de entrada). */
   intro?: boolean;
 }
 
-/** Textura circular suave para que los puntos sean redondos y difuminados. */
+/** Textura circular suave para que los nodos sean redondos y difuminados. */
 function createCircleTexture() {
   const size = 64;
   const canvas = document.createElement("canvas");
@@ -71,14 +71,15 @@ export const ParticleField = ({
     canvas.style.pointerEvents = "none";
     container.appendChild(canvas);
 
-    // ----- Dimensiones del campo (se ajustan al frustum visible) -----
-    const REST_COUNT = 1400; // partículas del campo en reposo (las que quedan)
-    const FLY_COUNT = 550; // partículas "de viaje" que cruzan la cámara al entrar
-    const COUNT = REST_COUNT + FLY_COUNT;
-    const Z_SPREAD = 60; // profundidad: z entre -30 y 30
+    // ----- Parámetros de la red (tuneables) -----
+    const NODE_COUNT = 180; // nodos de la red
+    const MAX_NEIGHBORS = 6; // tope de líneas por nodo (malla pareja, no se sobre-conecta)
+    const Z_SPREAD = 36; // profundidad leve
     let fieldW = 0;
     let fieldH = 0;
     let repelRadius = 16;
+    let connectDist = 20; // distancia para unir dos nodos
+    let mouseDist = 28; // distancia para unir un nodo al cursor
 
     // Tamaño visible del plano a una distancia dada de la cámara.
     const visibleSizeAt = (dist: number) => {
@@ -87,24 +88,25 @@ export const ParticleField = ({
     };
 
     const recomputeField = () => {
-      // Cubrir incluso la capa más lejana (la que ocupa más pantalla por unidad).
       const farDist = camera.position.z + Z_SPREAD / 2;
       const { w, h } = visibleSizeAt(farDist);
       const margin = 1.12;
       fieldW = w * margin;
       fieldH = h * margin;
       repelRadius = fieldH * 0.13;
+      mouseDist = fieldH * 0.22;
+      // connectDist se calcula en populate (depende del tamaño de celda de la grilla).
     };
     recomputeField();
 
-    // ----- Campo de partículas -----
-    const positions = new Float32Array(COUNT * 3);
-    const basePositions = new Float32Array(COUNT * 3);
-    const startPositions = new Float32Array(COUNT * 3); // de dónde "vuelan" al entrar
-    const introOffsets = new Float32Array(COUNT); // retardo de entrada por partícula
-    const velocities = new Float32Array(COUNT * 3);
-    const colors = new Float32Array(COUNT * 3);
-    const baseColors = new Float32Array(COUNT * 3); // color de reposo por partícula
+    // ----- Nodos -----
+    const positions = new Float32Array(NODE_COUNT * 3);
+    const basePositions = new Float32Array(NODE_COUNT * 3);
+    const startPositions = new Float32Array(NODE_COUNT * 3); // entrada "assemble"
+    const introOffsets = new Float32Array(NODE_COUNT); // retardo escalonado
+    const velocities = new Float32Array(NODE_COUNT * 3);
+    const nodeColors = new Float32Array(NODE_COUNT * 3);
+    const neighborCount = new Uint8Array(NODE_COUNT); // conexiones por nodo (tope)
 
     const baseColor = new THREE.Color(0xededed);
     const accentColor = new THREE.Color(0xe82e22);
@@ -112,90 +114,99 @@ export const ParticleField = ({
     const playIntro = introRef.current;
 
     const populate = () => {
-      for (let i = 0; i < COUNT; i++) {
+      // Grilla jittereada -> nodos parejos (sin amontonamientos ni huecos).
+      const aspect = fieldW / fieldH;
+      const cols = Math.max(2, Math.round(Math.sqrt(NODE_COUNT * aspect)));
+      const rows = Math.ceil(NODE_COUNT / cols);
+      const cellW = fieldW / cols;
+      const cellH = fieldH / rows;
+      // Conectar a celdas vecinas (diagonal incluida) de forma consistente.
+      connectDist = Math.hypot(cellW, cellH) * 1.18;
+      const JITTER = 0.42; // % de la celda
+
+      for (let i = 0; i < NODE_COUNT; i++) {
         const i3 = i * 3;
-
-        if (i < REST_COUNT) {
-          // ----- Campo en reposo (las que quedan en el medio) -----
-          const x = (Math.random() - 0.5) * fieldW;
-          const y = (Math.random() - 0.5) * fieldH;
-          const z = (Math.random() - 0.5) * Z_SPREAD;
-          basePositions[i3] = x;
-          basePositions[i3 + 1] = y;
-          basePositions[i3 + 2] = z;
-
-          // Entrada: dispersas + giradas + al fondo, para volar a su lugar.
-          const swirl = 0.9;
-          const cos = Math.cos(swirl);
-          const sin = Math.sin(swirl);
-          const spread = 1.35;
-          startPositions[i3] = (x * cos - y * sin) * spread;
-          startPositions[i3 + 1] = (x * sin + y * cos) * spread;
-          startPositions[i3 + 2] = z - 150;
-          introOffsets[i] = Math.random() * 0.55;
-
-          // Las más lejanas, más tenues -> profundidad.
-          const depth = (z + Z_SPREAD / 2) / Z_SPREAD;
-          const brightness = 0.35 + depth * 0.65;
-          baseColors[i3] = baseColor.r * brightness;
-          baseColors[i3 + 1] = baseColor.g * brightness;
-          baseColors[i3 + 2] = baseColor.b * brightness;
-        } else {
-          // ----- Partículas "de viaje" (cruzan la cámara y se van) -----
-          // x,y constantes -> la perspectiva las hace salir radialmente (warp).
-          const x = (Math.random() - 0.5) * fieldW * 0.6;
-          const y = (Math.random() - 0.5) * fieldH * 0.6;
-          // Reposo: detrás de la cámara (z>60) => invisibles cuando termina.
-          basePositions[i3] = x;
-          basePositions[i3 + 1] = y;
-          basePositions[i3 + 2] = 90 + Math.random() * 90;
-          // Arrancan lejísimos al frente y aceleran hacia (y más allá de) la cámara.
-          startPositions[i3] = x;
-          startPositions[i3 + 1] = y;
-          startPositions[i3 + 2] = -250 - Math.random() * 400;
-          introOffsets[i] = Math.random() * 0.55;
-
-          const brightness = 0.7 + Math.random() * 0.3;
-          baseColors[i3] = baseColor.r * brightness;
-          baseColors[i3 + 1] = baseColor.g * brightness;
-          baseColors[i3 + 2] = baseColor.b * brightness;
-        }
-
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x =
+          -fieldW / 2 +
+          (col + 0.5 + (Math.random() - 0.5) * 2 * JITTER) * cellW;
+        const y =
+          -fieldH / 2 +
+          (row + 0.5 + (Math.random() - 0.5) * 2 * JITTER) * cellH;
+        const z = (Math.random() - 0.5) * Z_SPREAD;
+        basePositions[i3] = x;
+        basePositions[i3 + 1] = y;
+        basePositions[i3 + 2] = z;
         velocities[i3] = velocities[i3 + 1] = velocities[i3 + 2] = 0;
 
-        // Si hay intro, arrancan en la posición de entrada; si no, ya en reposo.
-        const sx = playIntro ? startPositions[i3] : basePositions[i3];
-        const sy = playIntro ? startPositions[i3 + 1] : basePositions[i3 + 1];
-        const sz = playIntro ? startPositions[i3 + 2] : basePositions[i3 + 2];
+        // Entrada: apenas dispersos hacia afuera + jitter; se asientan a su lugar.
+        startPositions[i3] = x * 1.18 + (Math.random() - 0.5) * fieldW * 0.06;
+        startPositions[i3 + 1] = y * 1.18 + (Math.random() - 0.5) * fieldH * 0.06;
+        startPositions[i3 + 2] = z * 1.18;
+        introOffsets[i] = Math.random() * 0.5;
+
+        // Brillo leve por profundidad.
+        const depth = (z + Z_SPREAD / 2) / Z_SPREAD;
+        const brightness = 0.55 + depth * 0.45;
+        nodeColors[i3] = baseColor.r * brightness;
+        nodeColors[i3 + 1] = baseColor.g * brightness;
+        nodeColors[i3 + 2] = baseColor.b * brightness;
+
+        const sx = playIntro ? startPositions[i3] : x;
+        const sy = playIntro ? startPositions[i3 + 1] : y;
+        const sz = playIntro ? startPositions[i3 + 2] : z;
         positions[i3] = sx;
         positions[i3 + 1] = sy;
         positions[i3 + 2] = sz;
-
-        colors[i3] = baseColors[i3];
-        colors[i3 + 1] = baseColors[i3 + 1];
-        colors[i3 + 2] = baseColors[i3 + 2];
       }
     };
     populate();
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const nodeGeometry = new THREE.BufferGeometry();
+    nodeGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(positions, 3)
+    );
+    nodeGeometry.setAttribute(
+      "color",
+      new THREE.BufferAttribute(nodeColors, 3)
+    );
 
     const circleTexture = createCircleTexture();
-    const material = new THREE.PointsMaterial({
-      size: 0.55,
+    const nodeMaterial = new THREE.PointsMaterial({
+      size: 0.7,
       map: circleTexture,
       vertexColors: true,
       transparent: true,
-      opacity: 0, // arranca invisible; la fase de entrada la sube
-      sizeAttenuation: true, // cercanas grandes, lejanas chicas -> profundidad
+      opacity: 0, // arranca invisible; la entrada la sube
+      sizeAttenuation: true,
       depthWrite: false,
       blending: THREE.NormalBlending,
     });
-
-    const points = new THREE.Points(geometry, material);
+    const points = new THREE.Points(nodeGeometry, nodeMaterial);
     scene.add(points);
+
+    // ----- Líneas (red) -----
+    // Buffers preasignados: conexiones nodo-nodo + nodo-mouse.
+    const maxSegments = NODE_COUNT * MAX_NEIGHBORS + NODE_COUNT;
+    const linePositions = new Float32Array(maxSegments * 2 * 3);
+    const lineColors = new Float32Array(maxSegments * 2 * 3);
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(linePositions, 3)
+    );
+    lineGeometry.setAttribute("color", new THREE.BufferAttribute(lineColors, 3));
+    const lineMaterial = new THREE.LineBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: 1,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
+    });
+    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(lines);
 
     // ----- Mouse en coordenadas de mundo (plano z=0) -----
     const mouse = new THREE.Vector2(-9999, -9999); // NDC
@@ -222,17 +233,17 @@ export const ParticleField = ({
     const REPEL_STRENGTH = 0.22;
     const SPRING = 0.01; // fuerza de retorno a la posición de reposo
     const DAMPING = 0.9; // inercia
-    const INTRO_MS = 2600; // duración de la entrada
-    const STAGGER = 0.55; // dispersión del retardo de entrada
-    const CAM_START = 130; // dolly: la cámara avanza y frena
-    const CAM_END = 60;
+    const INTRO_MS = 2200;
+    const STAGGER = 0.5;
+    const LINE_BRIGHTNESS = 0.5; // brillo máximo de las líneas (sutil)
     const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
-    const easeInQuad = (x: number) => x * x; // viaje: acelera y cruza al final
-    const tmpColor = new THREE.Color();
-    const tmpBase = new THREE.Color();
+    const clamp01 = (x: number) => Math.min(Math.max(x, 0), 1);
+    // Temporales de color reutilizables (evitan asignaciones por frame).
+    const tmpColorA = new THREE.Color();
+    const tmpColorB = new THREE.Color();
     let rafId = 0;
     let t = 0;
-    let introStart = 0; // se fija en el primer frame activo
+    let introStart = 0;
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
@@ -244,27 +255,26 @@ export const ParticleField = ({
         ? Math.min((now - introStart) / INTRO_MS, 1)
         : 1;
 
-      // Dolly de cámara durante la entrada (sensación de atravesar el espacio).
-      camera.position.z =
-        CAM_END + (CAM_START - CAM_END) * (1 - easeOutCubic(introP));
+      const posAttr = nodeGeometry.attributes.position as THREE.BufferAttribute;
+      const colAttr = nodeGeometry.attributes.color as THREE.BufferAttribute;
 
-      const posAttr = geometry.attributes.position as THREE.BufferAttribute;
-      const colAttr = geometry.attributes.color as THREE.BufferAttribute;
+      // Opacidades de entrada: nodos primero, líneas se "arman" después.
+      nodeMaterial.opacity = 0.85 * clamp01(easeOutCubic(introP) * 1.5);
+      lineMaterial.opacity = clamp01((introP - 0.35) / 0.65);
 
-      // ----- Fase de entrada: viajamos por el espacio y frenamos en el medio -----
-      if (introP < 1) {
-        material.opacity = 0.85 * Math.min(easeOutCubic(introP) * 1.5, 1);
-        for (let i = 0; i < COUNT; i++) {
-          const i3 = i * 3;
-          const offset = introOffsets[i];
-          // progreso local escalonado por partícula
-          const local = Math.min(
-            Math.max((introP - offset) / (1 - STAGGER), 0),
-            1
-          );
-          // El campo en reposo desacelera al llegar; las de viaje aceleran y cruzan.
-          const e = i < REST_COUNT ? easeOutCubic(local) : easeInQuad(local);
-          const px = startPositions[i3] + (basePositions[i3] - startPositions[i3]) * e;
+      t += 0.004;
+      const radiusSq = repelRadius * repelRadius;
+
+      // ----- Mover nodos -----
+      for (let i = 0; i < NODE_COUNT; i++) {
+        const i3 = i * 3;
+
+        // Durante la entrada: interpolar desde la posición dispersa al reposo.
+        if (introP < 1) {
+          const local = clamp01((introP - introOffsets[i]) / (1 - STAGGER));
+          const e = easeOutCubic(local);
+          const px =
+            startPositions[i3] + (basePositions[i3] - startPositions[i3]) * e;
           const py =
             startPositions[i3 + 1] +
             (basePositions[i3 + 1] - startPositions[i3 + 1]) * e;
@@ -275,24 +285,14 @@ export const ParticleField = ({
           positions[i3 + 1] = py;
           positions[i3 + 2] = pz;
           posAttr.setXYZ(i, px, py, pz);
+          continue;
         }
-        posAttr.needsUpdate = true;
-        renderer.render(scene, camera);
-        return;
-      }
-      material.opacity = 0.85;
 
-      t += 0.004;
-      const radiusSq = repelRadius * repelRadius;
-
-      // Solo el campo en reposo tiene física; las de viaje quedan detrás de cámara.
-      for (let i = 0; i < REST_COUNT; i++) {
-        const i3 = i * 3;
         let px = positions[i3];
         let py = positions[i3 + 1];
         const pz = positions[i3 + 2];
 
-        // Repulsión desde el cursor (en el plano XY).
+        // Repulsión sutil desde el cursor (en el plano XY).
         let proximity = 0;
         if (mouseActive) {
           const dx = px - mouseWorld.x;
@@ -301,7 +301,7 @@ export const ParticleField = ({
           if (distSq < radiusSq) {
             const dist = Math.sqrt(distSq) || 0.0001;
             const falloff = 1 - dist / repelRadius;
-            const force = falloff * falloff * REPEL_STRENGTH; // caída suave
+            const force = falloff * falloff * REPEL_STRENGTH;
             proximity = falloff;
             velocities[i3] += (dx / dist) * force;
             velocities[i3 + 1] += (dy / dist) * force;
@@ -313,41 +313,113 @@ export const ParticleField = ({
         const driftY = Math.cos(t + basePositions[i3] * 0.1) * 0.006;
         velocities[i3] += (basePositions[i3] - px) * SPRING + driftX;
         velocities[i3 + 1] += (basePositions[i3 + 1] - py) * SPRING + driftY;
-
         velocities[i3] *= DAMPING;
         velocities[i3 + 1] *= DAMPING;
-
         px += velocities[i3];
         py += velocities[i3 + 1];
-
         positions[i3] = px;
         positions[i3 + 1] = py;
         posAttr.setXYZ(i, px, py, pz);
 
-        // Tinte rojo en las partículas cercanas al cursor (acento de marca).
+        // Nodos cercanos al cursor se tiñen de rojo.
         if (proximity > 0) {
-          tmpColor
-            .setRGB(baseColors[i3], baseColors[i3 + 1], baseColors[i3 + 2])
+          tmpColorA
+            .setRGB(nodeColors[i3], nodeColors[i3 + 1], nodeColors[i3 + 2])
             .lerp(accentColor, Math.min(proximity * 1.2, 1));
-          colAttr.setXYZ(i, tmpColor.r, tmpColor.g, tmpColor.b);
-        } else if (colAttr.getX(i) !== baseColors[i3]) {
-          // Volver suavemente al color base de la partícula.
-          tmpBase.setRGB(baseColors[i3], baseColors[i3 + 1], baseColors[i3 + 2]);
-          tmpColor
+          colAttr.setXYZ(i, tmpColorA.r, tmpColorA.g, tmpColorA.b);
+        } else if (colAttr.getX(i) !== nodeColors[i3]) {
+          tmpColorB.setRGB(
+            nodeColors[i3],
+            nodeColors[i3 + 1],
+            nodeColors[i3 + 2]
+          );
+          tmpColorA
             .setRGB(colAttr.getX(i), colAttr.getY(i), colAttr.getZ(i))
-            .lerp(tmpBase, 0.06);
-          colAttr.setXYZ(i, tmpColor.r, tmpColor.g, tmpColor.b);
+            .lerp(tmpColorB, 0.06);
+          colAttr.setXYZ(i, tmpColorA.r, tmpColorA.g, tmpColorA.b);
         }
       }
-
       posAttr.needsUpdate = true;
       colAttr.needsUpdate = true;
 
-      // Rotación muy lenta del campo para dar profundidad.
-      points.rotation.z = Math.sin(t * 0.2) * 0.015;
+      // ----- Construir líneas de la red -----
+      let seg = 0; // índice de vértice de línea
+      const connectSq = connectDist * connectDist;
+      const maxVerts = maxSegments * 2;
+      neighborCount.fill(0); // resetear conteo de conexiones por nodo
+
+      for (let i = 0; i < NODE_COUNT; i++) {
+        const i3 = i * 3;
+        const ax = positions[i3];
+        const ay = positions[i3 + 1];
+        const az = positions[i3 + 2];
+        if (neighborCount[i] >= MAX_NEIGHBORS) continue;
+        for (let j = i + 1; j < NODE_COUNT; j++) {
+          if (seg >= maxVerts) break;
+          if (neighborCount[i] >= MAX_NEIGHBORS) break;
+          if (neighborCount[j] >= MAX_NEIGHBORS) continue;
+          const j3 = j * 3;
+          const dx = ax - positions[j3];
+          const dy = ay - positions[j3 + 1];
+          const dz = az - positions[j3 + 2];
+          const dSq = dx * dx + dy * dy + dz * dz;
+          if (dSq < connectSq) {
+            const d = Math.sqrt(dSq);
+            // líneas largas más tenues -> se funden con el fondo oscuro
+            const b = (1 - d / connectDist) * LINE_BRIGHTNESS;
+            const s2 = seg * 3;
+            linePositions[s2] = ax;
+            linePositions[s2 + 1] = ay;
+            linePositions[s2 + 2] = az;
+            linePositions[s2 + 3] = positions[j3];
+            linePositions[s2 + 4] = positions[j3 + 1];
+            linePositions[s2 + 5] = positions[j3 + 2];
+            lineColors[s2] = lineColors[s2 + 3] = baseColor.r * b;
+            lineColors[s2 + 1] = lineColors[s2 + 4] = baseColor.g * b;
+            lineColors[s2 + 2] = lineColors[s2 + 5] = baseColor.b * b;
+            seg += 2;
+            neighborCount[i]++;
+            neighborCount[j]++;
+          }
+        }
+      }
+
+      // Líneas hacia el cursor (acento rojo).
+      if (mouseActive && introP >= 1) {
+        const mouseSq = mouseDist * mouseDist;
+        for (let i = 0; i < NODE_COUNT; i++) {
+          if (seg >= maxVerts) break;
+          const i3 = i * 3;
+          const dx = positions[i3] - mouseWorld.x;
+          const dy = positions[i3 + 1] - mouseWorld.y;
+          const dSq = dx * dx + dy * dy;
+          if (dSq < mouseSq) {
+            const d = Math.sqrt(dSq);
+            const b = (1 - d / mouseDist) * 0.9;
+            const s2 = seg * 3;
+            linePositions[s2] = positions[i3];
+            linePositions[s2 + 1] = positions[i3 + 1];
+            linePositions[s2 + 2] = positions[i3 + 2];
+            linePositions[s2 + 3] = mouseWorld.x;
+            linePositions[s2 + 4] = mouseWorld.y;
+            linePositions[s2 + 5] = 0;
+            lineColors[s2] = lineColors[s2 + 3] = accentColor.r * b;
+            lineColors[s2 + 1] = lineColors[s2 + 4] = accentColor.g * b;
+            lineColors[s2 + 2] = lineColors[s2 + 5] = accentColor.b * b;
+            seg += 2;
+          }
+        }
+      }
+
+      lineGeometry.setDrawRange(0, seg);
+      (lineGeometry.attributes.position as THREE.BufferAttribute).needsUpdate =
+        true;
+      (lineGeometry.attributes.color as THREE.BufferAttribute).needsUpdate =
+        true;
 
       renderer.render(scene, camera);
     };
+
     animate();
 
     // ----- Resize -----
@@ -358,7 +430,7 @@ export const ParticleField = ({
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
       recomputeField();
-      populate(); // redistribuir para cubrir el nuevo viewport
+      populate();
     };
     window.addEventListener("resize", handleResize);
 
@@ -368,8 +440,10 @@ export const ParticleField = ({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("resize", handleResize);
-      geometry.dispose();
-      material.dispose();
+      nodeGeometry.dispose();
+      nodeMaterial.dispose();
+      lineGeometry.dispose();
+      lineMaterial.dispose();
       circleTexture.dispose();
       renderer.dispose();
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
